@@ -12,14 +12,10 @@ interface FormValues{
 }
 interface Props {
     submit: React.Dispatch<React.SetStateAction<number>>;
-    
+    setFormValues: React.Dispatch<React.SetStateAction<{}>>;
+    prevValues: any;
   }
-const initialValue :FormValues ={
-    name:'',
-    password:'',
-    email:'',
-    confirmPassword:''
-}
+
 
 const registerSchema = Yup.object().shape({
     name:Yup.string()
@@ -36,26 +32,25 @@ const registerSchema = Yup.object().shape({
     .oneOf([Yup.ref("password")], "Password is not matching"),
 }) 
 
-const InfoForm:React.FC<Props>=({submit}) =>{
+const InfoForm:React.FC<Props>=({submit,setFormValues,
+  prevValues}) =>{
 
-    const forSubmit =(values:FormValues):void =>{
-        alert(JSON.stringify(values));
-    }
     return (
         <div>
      
         <Formik 
-        initialValues={initialValue}
+        initialValues={prevValues}
         onSubmit={(values:FormValues)=>{
-            submit(1);
+            submit(2);
+            setFormValues({ ...values,...prevValues });
         }}
         validationSchema={registerSchema}
         >
             {({dirty, isValid}) =>
           {  return(
             <Form >   
-                     <h3>Account Information</h3> 
-                     
+                     <h2 style={{'textAlign':'center'}}>Account Information</h2> 
+                 
             <Grid container spacing={1} justify="center">
                 
             <Grid item xs={12} sm={4}  justify="center" alignItems="center">
@@ -120,12 +115,15 @@ const InfoForm:React.FC<Props>=({submit}) =>{
             
             </Grid>
             <br/>
-                <Button variant="contained" color="primary" type='submit' disabled={!dirty || !isValid}>
-                    Submit
-                    </Button>
-                <Button variant="contained" color="primary" type="submit"  onClick={() => submit(0)}>
+            <div style={{'textAlign':'center'}}>
+          
+              <Button variant="contained" onClick={() => submit(0)} >
+                Back
+              </Button>
+                <Button variant="contained" color="primary" type="submit">
                 Next
               </Button>
+</div>
            
             </Form>
             )}

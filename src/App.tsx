@@ -1,5 +1,4 @@
-import React from 'react';
-import InfoForm from './Components/InfoForm';
+
 import FormStepper from './Stepper';
 import { Container, Box } from "@material-ui/core";
 

@@ -1,36 +1,128 @@
 import React from 'react';
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
+import { makeStyles, Theme, createStyles,withStyles } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
 import InfoForm from '../Components/InfoForm';
+import PersonalInfo from '../Components/PersonalInfo';
+import Review from '../Components/Review';
+import clsx from 'clsx';
+import SettingsIcon from '@material-ui/icons/Settings';
+import GroupAddIcon from '@material-ui/icons/GroupAdd';
+import VideoLabelIcon from '@material-ui/icons/VideoLabel';
+import StepConnector from '@material-ui/core/StepConnector';
+import { StepIconProps } from '@material-ui/core/StepIcon';
+
+
+
+const ColorlibConnector = withStyles({
+  alternativeLabel: {
+    top: 22,
+  },
+  active: {
+    '& $line': {
+      backgroundImage:
+        'linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)',
+    },
+  },
+  completed: {
+    '& $line': {
+      backgroundImage:
+        'linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)',
+    },
+  },
+  line: {
+    height: 3,
+    border: 0,
+    backgroundColor: '#eaeaf0',
+    borderRadius: 1,
+  },
+})(StepConnector);
+
+const useColorlibStepIconStyles = makeStyles({
+  root: {
+    backgroundColor: '#ccc',
+    zIndex: 1,
+    color: '#fff',
+    width: 50,
+    height: 50,
+    display: 'flex',
+    borderRadius: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  active: {
+    backgroundImage:
+      'linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)',
+    boxShadow: '0 4px 10px 0 rgba(0,0,0,.25)',
+  },
+  completed: {
+    backgroundImage:
+      'linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)',
+  },
+});
+
+function ColorlibStepIcon(props: StepIconProps) {
+  const classes = useColorlibStepIconStyles();
+  const { active, completed } = props;
+
+  const icons: { [index: string]: React.ReactElement } = {
+    1: <SettingsIcon />,
+    2: <GroupAddIcon />,
+    3: <VideoLabelIcon />,
+  };
+
+  return (
+    <div
+      className={clsx(classes.root, {
+        [classes.active]: active,
+        [classes.completed]: completed,
+      })}
+    >
+      {icons[String(props.icon)]}
+    </div>
+  );
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: '100%',
     },
-    backButton: {
+    button: {
       marginRight: theme.spacing(1),
     },
- 
+    instructions: {
+      marginTop: theme.spacing(1),
+      marginBottom: theme.spacing(1),
+    },
   }),
 );
 
+
 function getSteps() {
-  return ['Form1', 'Form2', 'Form3'];
+  return [ 'Personal Info','Account Info', 'Review'];
 }
 
-function getStepContent(stepIndex: number,setStepIndex: React.Dispatch<React.SetStateAction<number>>) {
+function getStepContent(stepIndex: number,
+  setStepIndex: React.Dispatch<React.SetStateAction<number>>,
+  setFormValues: React.Dispatch<React.SetStateAction<{}>>,
+  formValues: {}) {
   switch (stepIndex) {
     case 0:
-      return <InfoForm  submit={setStepIndex}/>;
+      return <PersonalInfo
+       submit={setStepIndex}     
+      prevValues={formValues}
+      setFormValues={setFormValues}/>;
     case 1:
-      return <InfoForm  submit={setStepIndex}/>;
+      return <InfoForm  submit={setStepIndex} 
+      prevValues={formValues}
+      setFormValues={setFormValues}/>;
     case 2:
-      return <InfoForm  submit={setStepIndex}/>;
+      return <Review values={formValues} 
+      submit={setStepIndex} 
+      setFormValues={setFormValues}  
+      />;
     default:
       return 'Unknown stepIndex';
   }
@@ -39,36 +131,25 @@ function getStepContent(stepIndex: number,setStepIndex: React.Dispatch<React.Set
 export default function FoStepper() {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
-  const steps = getSteps();
+  const [formValues, setFormValues] = React.useState({});
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
+  const steps = getSteps(); 
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
 
-  const handleReset = () => {
-    setActiveStep(0);
-  };
 
   return (
     <div className={classes.root}>
-      <Stepper activeStep={activeStep} alternativeLabel>
+     <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>
         {steps.map((label) => (
           <Step key={label}>
-            <StepLabel>{label}</StepLabel>
+            <StepLabel StepIconComponent={ColorlibStepIcon}>{label}</StepLabel>
           </Step>
         ))}
       </Stepper>
     
-         {getStepContent(activeStep,setActiveStep)}
+         {getStepContent(activeStep,setActiveStep, setFormValues, formValues)}
           
-            {/* <Button variant="contained" color="primary" onClick={handleNext}>
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-            </Button> */}
-             
+           
   
     </div>
   );
